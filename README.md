@@ -26,3 +26,10 @@ Background and Obstacle Images: Replace "background.png" and "pipe.png" with you
 Python 3.x
 Pygame library (install using pip install pygame)
 Note: The leaderboard functionality has been removed based on user request, and the README reflects the updated description of the game.
+
+# Figures 
+![Local Image](Screenshoots/1.png)
+![Local Image](Screenshoots/2.png)
+![Local Image](Screenshoots/3.png)
+
+
