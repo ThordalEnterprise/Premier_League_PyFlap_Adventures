@@ -26,8 +26,6 @@ pygame.display.set_caption("Runner Game")
 background_image = pygame.image.load("background.png")
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-
-
 pipe_image = pygame.image.load("pipe.png")
 pipe_image = pygame.transform.scale(pipe_image, (50, 50))
 
@@ -36,7 +34,6 @@ font = pygame.font.Font(None, 36)
 
 # Clock for controlling the frame rate
 clock = pygame.time.Clock()
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, bird_image):
@@ -64,7 +61,6 @@ class Player(pygame.sprite.Sprite):
             self.on_ground = True
             self.jumps_remaining = MAX_JUMPS  # Reset jumps when landing
 
-
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -78,7 +74,6 @@ class Obstacle(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.rect.left = WIDTH
             self.rect.y = HEIGHT - self.rect.height  # Adjust the position when it goes off-screen
-
 
 class StartMenu:
     def __init__(self):
@@ -110,7 +105,6 @@ class StartMenu:
             text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + (i - 1) * 40))  # Adjust the vertical position
             screen.blit(text, text_rect)
 
-
 class GameOver:
     def __init__(self, elapsed_time):
         self.elapsed_time = elapsed_time
@@ -137,7 +131,6 @@ class GameOver:
         time_text = font.render(f"Time: {self.elapsed_time} ms", True, WHITE)
         time_rect = time_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
         screen.blit(time_text, time_rect)
-
 
 class Game:
     def __init__(self, default_bird_image):
@@ -207,8 +200,6 @@ class Game:
                     print("Game Over!")
                     self.game_over = True
 
-
-
     def remove_off_screen_obstacles(self):
         for obstacle in self.obstacles:
             if obstacle.rect.right < 0:
@@ -225,9 +216,7 @@ class Game:
         score_text = font.render(f"Time: {elapsed_time} ms", True, RED)
         score_rect = score_text.get_rect(topright=(WIDTH - 10, 10))
         screen.blit(score_text, score_rect)
-
         self.all_sprites.draw(screen)
-
 
 def display_jumper_options():
     jumper_folder = "Jumpers"
@@ -236,8 +225,6 @@ def display_jumper_options():
         if file_name.lower().endswith(".png"):
             jumper_options.append(pygame.image.load(os.path.join(jumper_folder, file_name)))
     return jumper_options
-
-# ... (Previous code)
 
 def display_jumper_selection_screen():
     jumper_options = display_jumper_options()
@@ -272,7 +259,6 @@ def display_jumper_images(jumper_options, selected_option, scale):
 
         if i == selected_option:
             pygame.draw.rect(screen, RED, image_rect, 2)
-
 
 if __name__ == "__main__":
     start_menu = StartMenu()
