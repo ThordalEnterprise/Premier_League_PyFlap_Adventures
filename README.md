@@ -1,4 +1,4 @@
-# Premier_League_PyFlap_Adventures
+# Premier_League_PyRunner_Adventures
 
 # Runner Game
 This is a simple endless runner game implemented in Python using the Pygame library. The player controls a character that can jump to avoid obstacles, and the goal is to survive as long as possible while collecting points.
