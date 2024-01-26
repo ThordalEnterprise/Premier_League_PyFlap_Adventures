@@ -31,5 +31,9 @@ Note: The leaderboard functionality has been removed based on user request, and 
 ![Local Image](Screenshots/1.png)
 ![Local Image](Screenshots/2.png)
 ![Local Image](Screenshots/3.png)
+![Local Image](Screenshots/4.png)
+![Local Image](Screenshots/5.png)
+![Local Image](Screenshots/6.png)
+
 
 

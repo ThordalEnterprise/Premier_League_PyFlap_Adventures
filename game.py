@@ -20,13 +20,15 @@ RED = (255, 0, 0)
 
 # Create the screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Runner Game")
+pygame.display.set_caption("Premier_League_PyRunner_Adventures")
 
 # Load background, bird, and pipe images
-background_image = pygame.image.load("background.png")
+WHITE = (255, 255, 255)
+background_image = pygame.Surface((WIDTH, HEIGHT))
+background_image.fill(WHITE)
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-pipe_image = pygame.image.load("pipe.png")
+pipe_image = pygame.image.load("Obstacles/pipe.png")
 pipe_image = pygame.transform.scale(pipe_image, (50, 50))
 
 # Load font
@@ -35,8 +37,14 @@ font = pygame.font.Font(None, 36)
 # Clock for controlling the frame rate
 clock = pygame.time.Clock()
 
+class JumperImage(pygame.Surface):
+    def __init__(self, surface, name):
+        super().__init__(surface.get_size(), pygame.SRCALPHA)
+        self.blit(surface, (0, 0))
+        self.name = name
+
 class Player(pygame.sprite.Sprite):
-    def __init__(self, bird_image):
+    def __init__(self, bird_image, image_name):
         super().__init__()
         self.image = bird_image
         self.rect = self.image.get_rect()
@@ -44,6 +52,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity = 0
         self.on_ground = True
         self.jumps_remaining = MAX_JUMPS
+        self.image_name = image_name  # Store the image name
 
     def jump(self):
         if self.on_ground or self.jumps_remaining > 0:
@@ -77,32 +86,34 @@ class Obstacle(pygame.sprite.Sprite):
 
 class StartMenu:
     def __init__(self):
-        self.menu_options = ["New Game", "Leaderboard", "End Game"]
+        self.menu_options = ["New Game","Leaderboard", "Game Rules", "End Game"]
         self.selected_option = 0
 
     def run(self):
-        while True:
-            screen.fill(BLACK)
-            self.display_menu()
-            pygame.display.flip()
+            while True:
+                screen.fill(BLACK)
+                self.display_menu()
+                pygame.display.flip()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        self.selected_option = (self.selected_option - 1) % len(self.menu_options)
-                    elif event.key == pygame.K_DOWN:
-                        self.selected_option = (self.selected_option + 1) % len(self.menu_options)
-                    elif event.key == pygame.K_RETURN:
-                        if self.selected_option == 0:
-                            return "new_game"
-                        elif self.selected_option == 1:
-                            return "leaderboard"
-                        elif self.selected_option == 2:
-                            pygame.quit()
-                            sys.exit()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_UP:
+                            self.selected_option = (self.selected_option - 1) % len(self.menu_options)
+                        elif event.key == pygame.K_DOWN:
+                            self.selected_option = (self.selected_option + 1) % len(self.menu_options)
+                        elif event.key == pygame.K_RETURN:
+                            if self.selected_option == 0:
+                                return "new_game"
+                            elif self.selected_option == 1:
+                                return "leaderboard"
+                            elif self.selected_option == 2:
+                                return "rules"
+                            elif self.selected_option == 3:
+                                pygame.quit()
+                                sys.exit()
 
     def display_menu(self):
         for i, option in enumerate(self.menu_options):
@@ -111,12 +122,43 @@ class StartMenu:
             text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + (i - 1) * 40))  # Adjust the vertical position
             screen.blit(text, text_rect)
 
+class GameRules:
+    def display_rules(self):
+        rules_text = [
+            "1. Press SPACE to make the player jump.",
+            "2. Avoid colliding with obstacles to survive.",
+            "3. You have three limited number of jumps.",
+            "4. Have fun!",
+            "",
+            "Press ENTER to go back to the main menu."
+        ]
+
+        while True:
+            screen.fill(BLACK)
+            self.draw_rules(rules_text)
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    return
+
+    def draw_rules(self, rules_text):
+        for i, line in enumerate(rules_text):
+            text = font.render(line, True, WHITE)
+            text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 4 + i * 30))
+            screen.blit(text, text_rect)
+
+
+
 class Leaderboard:
     def __init__(self):
         self.scores = []
 
-    def add_score(self, score):
-        self.scores.append(score)
+    def add_score(self, score, image_name):
+        self.scores.append((score, image_name))
         self.scores.sort(reverse=True)  # Sort in descending order
 
     def display(self):
@@ -137,8 +179,8 @@ class Leaderboard:
         leaderboard_rect = leaderboard_text.get_rect(center=(WIDTH // 2, HEIGHT // 4))
         screen.blit(leaderboard_text, leaderboard_rect)
 
-        for i, score in enumerate(self.scores):
-            score_text = font.render(f"{i + 1}. {score} ms", True, WHITE)
+        for i, (score, image_name) in enumerate(self.scores):
+            score_text = font.render(f"{i + 1}. {score} ms - {image_name[:-4]}", True, WHITE)
             score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 4 + (i + 1) * 40))
             screen.blit(score_text, score_rect)
 
@@ -146,7 +188,7 @@ class GameOver:
     def __init__(self, elapsed_time):
         self.elapsed_time = elapsed_time
 
-    def run(self, leaderboard):
+    def run(self, leaderboard, image_name):
         while True:
             screen.fill(BLACK)
             self.display_game_over()
@@ -158,7 +200,7 @@ class GameOver:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        leaderboard.add_score(self.elapsed_time)
+                        leaderboard.add_score(self.elapsed_time, image_name)
                         leaderboard.display()
                         return
 
@@ -172,10 +214,10 @@ class GameOver:
         screen.blit(time_text, time_rect)
 
 class Game:
-    def __init__(self, default_bird_image):
+    def __init__(self, default_bird_image, image_name):
         self.all_sprites = pygame.sprite.Group()
         self.obstacles = pygame.sprite.Group()
-        self.player = Player(default_bird_image)
+        self.player = Player(default_bird_image, image_name)
         self.all_sprites.add(self.player)
         self.game_over = False  # Flag to track game over condition
         self.start_time = pygame.time.get_ticks()  # Record the start time
@@ -207,7 +249,7 @@ class Game:
 
         # Display the game over screen
         game_over_screen = GameOver(elapsed_time)
-        game_over_screen.run(leaderboard)
+        game_over_screen.run(leaderboard, self.player.image_name)
 
         # Return to the start menu after the game is done
         return self.score
@@ -262,7 +304,8 @@ def display_jumper_options():
     jumper_options = []
     for file_name in os.listdir(jumper_folder):
         if file_name.lower().endswith(".png"):
-            jumper_options.append(pygame.image.load(os.path.join(jumper_folder, file_name)))
+            image = pygame.image.load(os.path.join(jumper_folder, file_name))
+            jumper_options.append(JumperImage(image, file_name))  # Wrap the Surface with our class
     return jumper_options
 
 def display_jumper_selection_screen():
@@ -289,8 +332,8 @@ def display_jumper_selection_screen():
         clock.tick(FPS)
 
 def display_jumper_images(jumper_options, selected_option, scale):
-    for i, image in enumerate(jumper_options):
-        scaled_image = pygame.transform.scale(image, scale)
+    for i, image_obj in enumerate(jumper_options):
+        scaled_image = pygame.transform.scale(image_obj, scale)
         x = (WIDTH // 2 - (len(jumper_options) * (scale[0] + 10)) // 2) + i * (scale[0] + 10)
         y = HEIGHT // 2
         image_rect = scaled_image.get_rect(center=(x, y))
@@ -299,9 +342,11 @@ def display_jumper_images(jumper_options, selected_option, scale):
         if i == selected_option:
             pygame.draw.rect(screen, RED, image_rect, 2)
 
+
 if __name__ == "__main__":
     start_menu = StartMenu()
     leaderboard = Leaderboard()
+    game_rules = GameRules()
 
     while True:
         selected_option = start_menu.run()
@@ -316,9 +361,13 @@ if __name__ == "__main__":
             pygame.display.flip()
             pygame.time.wait(2000)
 
-            game = Game(default_bird_image)
+            game = Game(default_bird_image, selected_jumper.name)
             game.run(leaderboard)
 
         elif selected_option == "leaderboard":
             # Display Leaderboard
             leaderboard.display()
+
+        elif selected_option == "rules":
+            # Display Rules
+            game_rules.display_rules()
