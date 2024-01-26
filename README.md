@@ -27,9 +27,9 @@ Python 3.x
 Pygame library (install using pip install pygame)
 Note: The leaderboard functionality has been removed based on user request, and the README reflects the updated description of the game.
 
-# Figures 
-![Local Image](Screenshoots/1.png)
-![Local Image](Screenshoots/2.png)
-![Local Image](Screenshoots/3.png)
+# Screenshots 
+![Local Image](Screenshots/1.png)
+![Local Image](Screenshots/2.png)
+![Local Image](Screenshots/3.png)
 
 
